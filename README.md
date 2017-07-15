@@ -40,6 +40,7 @@ Bower:
 
 ## Future plans / TODO
 
+- Think of a better name
 - CSS variables for additional styling
 - Option to ignore specific links
 
