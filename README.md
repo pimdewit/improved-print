@@ -6,6 +6,7 @@ This web component is based on an A List Apart article from 2005(!), written by 
 
 Visit the original article: [https://alistapart.com/article/improvingprint](https://alistapart.com/article/improvingprint)
 
+
 ## Installation
 
 npm:
@@ -13,6 +14,7 @@ npm:
 
 Bower:
 `bower install improved-print`
+
 
 ## Usage
 
@@ -35,6 +37,7 @@ Bower:
 
 4. Once you hit print you should see the results directly!
 
+
 ## Future plans / TODO
 
 - CSS variables for additional styling
@@ -49,11 +52,12 @@ Bower:
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
 
+
 ## Credits
 
-Original concept and research: Aaron Gustafson @aarongustafson
-*: Pim de Wit @pdw_io
+- Original concept and research: Aaron Gustafson @aarongustafson
+- *: Pim de Wit @pdw_io
 
 ## License
 
-MIT License.
+[MIT](https://github.com/PimdeWit/improved-print/blob/master/LICENSE)

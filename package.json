@@ -1,7 +1,7 @@
 {
   "name": "improved-print",
-  "version": "1.0.0",
-  "description": "A custom-element allowing hyperlinks in print to be more accessible.",
+  "version": "1.0.1",
+  "description": "Turn mid-content hyperlinks into a listed footnote!",
   "repository": {
     "type": "git",
     "url": "https://github.com/pimdewit/improved-print.git"

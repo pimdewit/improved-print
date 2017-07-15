@@ -1,6 +1,6 @@
 {
   "name": "improved-print",
-  "description": "A custom-element allowing hyperlinks in print to be more accessible.",
+  "description": "Turn mid-content hyperlinks into a listed footnote!",
   "main": "",
   "authors": [
     "Pim de Wit <pim@pdw.io>"
