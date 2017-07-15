@@ -1,3 +1,5 @@
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/owner/my-element)
+
 # Improved Print
 
 <improved-print> is a 'leaf' custom-element. It's sole purpose is to encapsulate HTML, strip out the links within the content, and make a nice list of footnotes when attempting to print.
