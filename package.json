@@ -1,0 +1,27 @@
+{
+  "name": "improved-print",
+  "version": "1.0.0",
+  "description": "A custom-element allowing hyperlinks in print to be more accessible.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pimdewit/improved-print.git"
+  },
+  "keywords": [
+    "a11y",
+    "accessibility",
+    "print",
+    "custom",
+    "element",
+    "customelement",
+    "custom-element",
+    "webcomponent",
+    "web-component",
+    "native"
+  ],
+  "author": "Pim de Wit <pim@pdw.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pimdewit/improved-print/issues"
+  },
+  "homepage": "https://github.com/pimdewit/improved-print#readme"
+}

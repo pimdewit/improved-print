@@ -1,0 +1,24 @@
+{
+  "name": "improved-print",
+  "description": "A custom-element allowing hyperlinks in print to be more accessible.",
+  "main": "",
+  "authors": [
+    "Pim de Wit <pim@pdw.io>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "a11y",
+    "custom",
+    "element",
+    "webcomponent",
+    "accessibility"
+  ],
+  "homepage": "https://github.com/pimdewit/improved-print",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

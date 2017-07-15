@@ -1,0 +1,165 @@
+<template id="improved-print-template">
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+  <slot name="content"></slot>
+</template>
+
+<script>
+  class ImprovedPrint extends HTMLElement {
+    constructor() {
+      super();
+      
+      const templateId = 'improved-print-template';
+      const printSpecificClass = 'improved-print__print-only';
+      const currentDocument = document.currentScript.ownerDocument;
+      const template = currentDocument.getElementById(templateId).content;
+
+      this._printOnlyClass = printSpecificClass;
+
+      this.shadow = this.attachShadow({mode: 'open'});
+      this.shadow.appendChild(template.cloneNode(true));
+      
+      this._mql = window.matchMedia('print');
+      this._boundPrintListener = this._onPrint.bind(this);
+      
+      this._addListeners();
+    }
+    
+    /**
+    * @private
+    */
+    _addListeners() {
+      this._mql.addListener(this._boundPrintListener);
+    }
+    
+    /**
+    * On print handler.
+    * @param {MediaQueryListEvent} event
+    * @private
+    */
+    _onPrint(event) {
+      const isAboutToPrint = event.matches;
+      isAboutToPrint ? this._handleDOM() : this._removeDOM();
+    }
+    
+    /**
+    * Create and append the footnotes block.
+    * Create and append additional <sup> elements to serve as
+    *   notifiers within the original links.
+    * @private
+    */
+    _handleDOM() {
+      let links = this._getLinks();
+      
+      if (!links) return;
+
+      let container = document.createElement('div');
+      let orderedList = document.createElement('ol');
+      container.appendChild(orderedList);
+      container.className = `a11y__container ${this._printOnlyClass}`;
+
+      this.shadow.appendChild(container);
+
+      for (var index = 0; index < links.length; index++) {
+        let link = links[index];
+        let listNumber = index + 1;
+        let li = this._prepareFootnote(links[index], listNumber);
+
+        link.appendChild(this._createSupElement(listNumber));
+        orderedList.appendChild(li);
+      }
+    }
+    
+    /**
+    * Get all the links encapsulated by the component.
+    * @return {NodeList}
+    * @private
+    */
+    _getLinks() {
+      return this.querySelectorAll('a[href]');
+    }
+
+    /**
+    * Create a hyperlink and encapsulate it within an listitem.
+    * @param {HTMLElement} link
+    * @param {String} text
+    * @private
+    */
+    _prepareFootnote(link, text) {
+      const href = link.href;
+
+      let li = document.createElement('li');
+      let a = this._createLinkElement(href, href);
+
+      li.appendChild(a);
+      
+      return li;
+    }
+    
+    /**
+    * @param {String} text
+    * @param {String} href
+    * @return {HTMLElement}
+    * @private
+    */
+    _createLinkElement(text, href) {
+      let element = document.createElement('a');
+      let textNode = document.createTextNode(text);
+
+      element.href = href;
+
+      element.appendChild(textNode);
+
+      return element;
+    }
+    
+    /**
+    * @param {String} text
+    * @return {HTMLElement}
+    * @private
+    */
+    _createSupElement(text) {
+      let element = document.createElement('sup');
+      let textNode = document.createTextNode(text);
+
+      element.classList.add(this._printOnlyClass);
+
+      element.appendChild(textNode);
+      
+      return element;
+    }
+    
+    /**
+    * Remove all the generated DOM by looping through classes.
+    * @private
+    */
+    _removeDOM() {
+      const selector = `.${this._printOnlyClass}`;
+      let lightDOMElements = this.querySelectorAll(selector);
+      let shadowDOMElements = this.shadow.querySelectorAll(selector);
+      let elements = [...lightDOMElements, ...shadowDOMElements];
+      
+      for (var i = elements.length - 1; i >= 0; i--) {
+        elements[i].remove();
+      }
+    }
+    
+    /**
+    * Remove Event Listeners
+    * @private
+    */
+    _removeEventListeners() {
+      this._mql.removeListener(this._boundPrintListener);
+    }
+
+    detached() {
+      this._removeEventListeners();
+    }
+  }
+
+  // Define the new element
+  window.customElements.define('improved-print', ImprovedPrint);
+</script>
