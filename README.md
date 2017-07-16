@@ -8,6 +8,8 @@ This web component is based on an A List Apart article from 2005(!), written by 
 
 Visit the original article: [https://alistapart.com/article/improvingprint](https://alistapart.com/article/improvingprint)
 
+Demo: https://codepen.io/pimdewit/details/RgvxLP/
+
 
 ## Installation
 
