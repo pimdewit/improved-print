@@ -63,6 +63,6 @@ Bower:
 - Original concept and research: Aaron Gustafson @aarongustafson
 - *: Pim de Wit @pdw_io
 
-## License
+## Licence
 
 [MIT](https://github.com/PimdeWit/improved-print/blob/master/LICENSE)

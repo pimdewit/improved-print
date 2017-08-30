@@ -1,9 +1,4 @@
 <template id="improved-print-template">
-  <style>
-    :host {
-      display: block;
-    }
-  </style>
   <slot name="content"></slot>
 </template>
 
@@ -11,7 +6,7 @@
   class ImprovedPrint extends HTMLElement {
     constructor() {
       super();
-      
+
       const templateId = 'improved-print-template';
       const printSpecificClass = 'improved-print__print-only';
 
@@ -30,85 +25,84 @@
     }
     
     /**
-    * @private
-    */
+     * @private
+     */
     _addListeners() {
       this._mql.addListener(this._boundPrintListener);
     }
     
     /**
-    * On print handler.
-    * @param {MediaQueryListEvent} event
-    * @private
-    */
+     * On print handler.
+     * @param {MediaQueryListEvent} event
+     * @private
+     */
     _onPrint(event) {
       const isAboutToPrint = event.matches;
       isAboutToPrint ? this._handleDOM() : this._removeDOM();
     }
     
     /**
-    * Create and append the footnotes block.
-    * Create and append additional <sup> elements to serve as
-    *   notifiers within the original links.
-    * @private
-    */
+     * Create and append the footnotes block.
+     * Create and append additional <sup> elements to serve as
+     *   notifiers within the original links.
+     * @private
+     */
     _handleDOM() {
-      let links = this._getLinks();
+      const links = this.links;
       
       if (!links) return;
 
-      let container = document.createElement('div');
-      let orderedList = document.createElement('ol');
+      const container = document.createElement('div');
+      const orderedList = document.createElement('ol');
       container.appendChild(orderedList);
       container.className = `a11y__container ${this._printOnlyClass}`;
 
       this.shadow.appendChild(container);
 
-      for (var index = 0; index < links.length; index++) {
-        let link = links[index];
-        let listNumber = index + 1;
-        let li = this._prepareFootnote(links[index], listNumber);
+      for (let index = 0; index < links.length; index++) {
+        const link = links[index];
+        const listNumber = index + 1;
+        const listItem = this._prepareFootnote(links[index]);
 
-        link.appendChild(this._createSupElement(listNumber));
-        orderedList.appendChild(li);
+        link.appendChild(this._createSupElement(listNumber.toString()));
+        orderedList.appendChild(listItem);
       }
     }
     
     /**
-    * Get all the links encapsulated by the component.
-    * @return {NodeList}
-    * @private
-    */
-    _getLinks() {
+     * Get all the links encapsulated by the component.
+     * @return {NodeList}
+     * @private
+     */
+    get links() {
       return this.querySelectorAll('a[href]');
     }
 
     /**
-    * Create a hyperlink and encapsulate it within an listitem.
-    * @param {HTMLElement} link
-    * @param {String} text
-    * @private
-    */
-    _prepareFootnote(link, text) {
+     * Create a hyperlink and encapsulate it within an list item.
+     * @param {HTMLElement} link
+     * @private
+     */
+    _prepareFootnote(link) {
       const href = link.href;
 
-      let li = document.createElement('li');
-      let a = this._createLinkElement(href, href);
+      const listItem = document.createElement('li');
+      const a = this._createLinkElement(href, href);
 
-      li.appendChild(a);
+      listItem.appendChild(a);
       
-      return li;
+      return listItem;
     }
     
     /**
-    * @param {String} text
-    * @param {String} href
-    * @return {HTMLElement}
-    * @private
-    */
+     * @param {String} text
+     * @param {String} href
+     * @return {HTMLElement}
+     * @private
+     */
     _createLinkElement(text, href) {
-      let element = document.createElement('a');
-      let textNode = document.createTextNode(text);
+      const element = document.createElement('a');
+      const textNode = document.createTextNode(text);
 
       element.href = href;
 
@@ -118,13 +112,13 @@
     }
     
     /**
-    * @param {String} text
-    * @return {HTMLElement}
-    * @private
-    */
+     * @param {String} text
+     * @return {HTMLElement}
+     * @private
+     */
     _createSupElement(text) {
-      let element = document.createElement('sup');
-      let textNode = document.createTextNode(text);
+      const element = document.createElement('sup');
+      const textNode = document.createTextNode(text);
 
       element.classList.add(this._printOnlyClass);
 
@@ -134,30 +128,36 @@
     }
     
     /**
-    * Remove all the generated DOM by looping through classes.
-    * @private
-    */
+     * Remove all the generated DOM by looping through classes.
+     * @private
+     */
     _removeDOM() {
       const selector = `.${this._printOnlyClass}`;
-      let lightDOMElements = this.querySelectorAll(selector);
-      let shadowDOMElements = this.shadow.querySelectorAll(selector);
+      const lightDOMElements = this.querySelectorAll(selector);
+      const shadowDOMElements = this.shadow.querySelectorAll(selector);
       let elements = [...lightDOMElements, ...shadowDOMElements];
       
-      for (var i = elements.length - 1; i >= 0; i--) {
+      for (let i = elements.length - 1; i >= 0; i--) {
         elements[i].remove();
+        elements[i] = null;
       }
     }
     
     /**
-    * Remove Event Listeners
-    * @private
-    */
+     * Remove Event Listeners
+     * @private
+     */
     _removeEventListeners() {
       this._mql.removeListener(this._boundPrintListener);
     }
 
-    detached() {
+    disconnectedCallback() {
+      this._removeDOM();
       this._removeEventListeners();
+
+      this._mql = null;
+      this._boundPrintListener = null;
+      this.elements = null;
     }
   }
 
