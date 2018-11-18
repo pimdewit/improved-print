@@ -8,30 +8,31 @@ This web component is based on an A List Apart article from 2005(!), written by 
 
 Visit the original article: [https://alistapart.com/article/improvingprint](https://alistapart.com/article/improvingprint)
 
-Demo: https://codepen.io/pimdewit/details/RgvxLP/
-
 
 ## Installation
 
 npm:
-`npm install improved-print`
-
-Bower:
-`bower install improved-print`
+```bash
+npm install improved-print
+```
 
 
 ## Usage
 
-1. Import the component.
-`<link rel="import" href="improved-print.html">`
+1. Import the component by adding the following line to the end of your `<body>` tag.
+```html
+<script src="improved-print.js"></script>
+```
 
 2. Create the improved-print tag somewhere in the body.
-`<improved-print></improved-print>`
-
-3. Insert some HTML, and bind it to the "content" slot.
+```html
+<improved-print></improved-print>
 ```
+
+3. Insert some HTML with links you want to print.
+```html
 <improved-print>
-  <article slot="content">
+  <article>
     <h1>Hello World!</h1>
     <p>This is an <a href="https://www.google.com/">example link</a></p>
     <a href="https://www.wikipedia.com">Learn more!</a>
@@ -44,18 +45,9 @@ Bower:
 
 ## Future plans / TODO
 
-- Think of a better name
+- Think of a better name(?)
 - CSS variables for additional styling
 - Option to ignore specific links
-
-
-## Contributing
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
 
 
 ## Credits

@@ -1,6 +1,7 @@
 {
   "name": "improved-print",
-  "version": "1.0.2",
+  "version": "1.0.3",
+  "main": "improved-print.js",
   "description": "Turn mid-content hyperlinks into a listed footnote!",
   "repository": {
     "type": "git",
@@ -10,18 +11,15 @@
     "a11y",
     "accessibility",
     "print",
-    "custom",
-    "element",
-    "customelement",
-    "custom-element",
-    "webcomponent",
+    "javascript",
     "web-component",
-    "native"
+    "custom-element",
+    "vanilla js"
   ],
   "author": "Pim de Wit <pim@pdw.io>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pimdewit/improved-print/issues"
   },
-  "homepage": "https://github.com/pimdewit/improved-print#readme"
+  "homepage": "https://pimdewit.github.io/improved-print/"
 }
