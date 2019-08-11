@@ -1,42 +1,37 @@
-/**
- * ImprovedPrint is a 'leaf' custom-element. It's sole purpose is to
- *    encapsulate HTML, strip out the links within the content, and make a
- *    nice list of footnotes when attempting to print.
- */
+const CSS_SELECTORS = {
+  LINKS: `a[href]:not([data-no-improved-print])`,
+  HIDDEN_CLASS: 'improved-print--hidden',
+};
+
+
 class ImprovedPrint extends HTMLElement {
   /**
-   * Create an AnchorElement and encapsulate it within an list item.
-   * @param {HTMLAnchorElement.href|string} href
-   * @return {HTMLLIElement}
-   * @private
-   */
-  static _createFootnoteItem(href) {
-    const listItem = /** @type {HTMLLIElement} */ (document.createElement('li'));
-    const a = /** @type {HTMLAnchorElement} */ (document.createElement('a'));
-
-    a.href = href;
-    a.innerText = href;
-
-    listItem.appendChild(a);
-
-    return listItem;
-  }
-
-
-  /**
-   * Create the template.
+   * Create the template. We are doing this programmatically because we don't
+   *  want to obfuscate the DOM with an unused element (<template>).
    * @return {HTMLTemplateElement}
    */
   static template() {
-    const element = /** @type {HTMLTemplateElement} */ (document.createElement('template'));
+    const element = /** @type {HTMLTemplateElement} */ (
+        document.createElement('template'));
 
     element.innerHTML = `
       <style>
         :host {
-          display: inline-block;
+          display: inherit;
         }
-        :host([hidden]) {
+        :host([${CSS_SELECTORS.HIDDEN_CLASS}]) {
           display: none;
+        }
+        
+        :host .${CSS_SELECTORS.HIDDEN_CLASS} {
+          display: none;
+        }
+        
+        @media print {
+          :host .${CSS_SELECTORS.HIDDEN_CLASS},
+          :host ::slotted(.${CSS_SELECTORS.HIDDEN_CLASS}) {
+            display: inherit;
+          }
         }
       </style>
       <slot></slot>
@@ -45,173 +40,217 @@ class ImprovedPrint extends HTMLElement {
     return element;
   }
 
+  /**
+   * @return {{nav: HTMLElement, list: HTMLOListElement}}
+   */
+  static createNavigationalList() {
+    const nav = /** @type {HTMLElement} */ (
+        document.createElement('nav'));
+    nav.classList.add(CSS_SELECTORS.HIDDEN_CLASS);
 
-  /** @constructs {ImprovedPrint} */
+    const list = /** @type {HTMLOListElement} */ (
+        document.createElement('ol'));
+    /** @see {@link http://bit.ly/31yDhiy|Scott O'Hara}} */
+    list.setAttribute('role', 'list');
+
+    nav.appendChild(list);
+
+    return {nav, list};
+  }
+
+  /**
+   * Create an AnchorElement and encapsulate it within an list item.
+   * @param {string} href
+   * @return {HTMLLIElement}
+   * @private
+   */
+  static createFootnote(href) {
+    const listItem = /** @type {HTMLLIElement} */ (
+        document.createElement('li'));
+    const a = /** @type {HTMLAnchorElement} */ (document.createElement('a'));
+
+    a.href = href;
+    a.textContent = href;
+
+    listItem.appendChild(a);
+
+    return listItem;
+  }
+
+
   constructor() {
     super();
 
     /**
-     * Class that gets appended on print. This class is mainly used as a
-     *    selector. That way we can easily manage which elements need to get
-     *    removed when the user is done with the printing prompt.
-     * @type {string}
-     * @private
+     * @type {?ShadowRoot}
      */
-    this._printOnlyClass = 'improved-print__print-only';
+    this._shadowRoot = null;
 
     /**
-     * @type {ShadowRoot}
+     * @type {NodeList<HTMLAnchorElement>}
      * @private
-     * @see {@link https://mzl.la/2Tlfgsl|MDN - ShadowRoot}
      */
-    this._shadowRoot = this.attachShadow({mode: 'open'});
+    this._links = this._getLinks();
+
+    /**
+     * @type {?NodeList<HTMLElement>}
+     * @private
+     * @see ImprovedPrint._setup
+     */
+    this._supElements = null;
 
     /**
      * @type {MediaQueryList}
      * @private
-     * @see {@link https://mzl.la/2TmaXg9|MDN - MediaQueryList}
      */
-    this._printMediaObserver = window.matchMedia('print');
+    this._printObserver = window.matchMedia('print');
 
-    const template = ImprovedPrint.template();
-
-    // Append elements to our ShadowDOM.
-    this._shadowRoot.appendChild(template.content.cloneNode(true));
-
-    this.__onPrint = this._onPrint.bind(this);
-
-    this._addListeners();
+    // Scope bindings.
+    this._onPrint = this._onPrint.bind(this);
   }
 
 
-  /** @private */
-  _addListeners() {
-    this._printMediaObserver.addListener(this.__onPrint);
+  // Life cycle methods.
+
+  connectedCallback() {
+    if (this.isConnected) {
+      this._setup();
+      this._addEventListeners();
+    }
   }
 
+  disconnectedCallback() {
+    if (!this.isConnected) {
+      this._removeEventListeners();
+    }
+  }
+
+
+  // Events
 
   /**
-   * On print handler.
-   * @param {MediaQueryListEvent} event
+   * @private
+   */
+  _addEventListeners() {
+    this._printObserver.addListener(this._onPrint);
+  }
+
+  /**
+   * @private
+   */
+  _removeEventListeners() {
+    this._printObserver.removeListener(this._onPrint);
+  }
+
+  /**
+   * Triggers when the environment changes from screen to print.
+   * @param {MediaQueryList} event
    * @private
    */
   _onPrint(event) {
-    const isAboutToPrint = event.matches;
-    isAboutToPrint ? this._handleDOM() : this._removeDOM();
+    /**
+     * Unfortunately we have to do this in order to prevent adding a new
+     *    dependency which is out-of-scope styling.
+     */
+    if (event.matches) {
+      this._supElements.forEach(element => element.hidden = false);
+    } else {
+      requestAnimationFrame(() => {
+        // Wait a frame.
+        this._supElements.forEach(element => element.hidden = true);
+      });
+    }
   }
 
 
+  // Private API
+
   /**
-   * Create and append additional <sup> elements to serve as notifiers within the original links.
+   * Setup the main environment.
    * @private
    */
-  _handleDOM() {
-    const linksFromSlottedContent = this.originalLinks;
+  _setup() {
+    /** @type {DocumentFragment} */
+    const content = ImprovedPrint.template().content;
 
-    if (!linksFromSlottedContent) {
-      // Stop the process if no links could be found within the "light dom".
-      return;
-    }
+    this._shadowRoot = this.attachShadow({mode: 'open'});
+    this._shadowRoot.appendChild(content);
 
-    // Wrap the footnotes in a <nav> for semantic reasons.
-    const nav = document.createElement('nav');
-    nav.className = `${this._printOnlyClass}`;
+    this._generateDOM();
+  }
 
-    // Will contain all the footnotes & citations.
-    const footnoteContainer = document.createElement('ol');
-    footnoteContainer.setAttribute('role', 'list');
+  /**
+   *
+   * @param {HTMLOListElement} parent
+   * @param {NodeList<HTMLAnchorElement>} links
+   * @private
+   */
+  _createFootnotes(parent, links) {
+    links.forEach((link, index) => {
+      const citationItem = ImprovedPrint.createFootnote(link.href);
 
-    nav.appendChild(footnoteContainer);
+      // Create a superscript element to serve as an identifier.
+      const supElement = document.createElement('sup');
+      supElement.textContent = `${index + 1}`;
+      supElement.classList.add(CSS_SELECTORS.HIDDEN_CLASS);
+      supElement.inert = true;
+      supElement.hidden = true;
+      supElement.setAttribute('aria-hidden', 'true');
+
+      link.appendChild(supElement);
+
+      parent.appendChild(citationItem);
+    });
+
+    this._supElements = this._getSupElements();
+  }
+
+  /**
+   * Generate all necessary DOM.
+   * @private
+   */
+  _generateDOM() {
+    if (!this.links) return;
+
+    const {nav, list} = ImprovedPrint.createNavigationalList();
+    nav.classList.add(CSS_SELECTORS.HIDDEN_CLASS);
+    nav.inert = true;
+    nav.setAttribute('aria-hidden', 'true');
+
+    this._createFootnotes(list, this.links);
     this._shadowRoot.appendChild(nav);
-
-    this._createDOM(footnoteContainer, linksFromSlottedContent);
   }
 
-
   /**
-   * Add numbers/identifiers to all AnchorElements with [href] in the slotted DOM.
-   * @param {HTMLElement} footnoteContainer - The footnote/citation-item nodes
-   *    will get appended to this element.
-   * @param {NodeList<HTMLAnchorElement>} originalLinks - The original
-   *    links' will get modified by adding an extra ChildNode to the DOM.
+   * Get all links encapsulated in the LIGHT DOM of this component.
    * @private
-   */
-  _createDOM(footnoteContainer, originalLinks) {
-    for (let linkIndex = 0; linkIndex < originalLinks.length; linkIndex += 1) {
-      const link = originalLinks[linkIndex];
-
-      // Create an element that contains the footnote info.
-      const citationItem = ImprovedPrint._createFootnoteItem(link.href);
-      // Append the footnote info to its container.
-      footnoteContainer.appendChild(citationItem);
-
-      this._addCitationIndexToInitialLink(link, linkIndex + 1);
-    }
-  }
-
-
-  /**
-   * Modify the initial anchor element (from the "light DOM") by adding a
-   *    superscript element containing the citation index.
-   * @param {HTMLAnchorElement} link
-   * @param {number} index - The citation index.
-   * @private
-   */
-  _addCitationIndexToInitialLink(link, index) {
-    // Create a superscript element to serve as an identifier.
-    const supElement = document.createElement('sup');
-    supElement.innerText = `${index}`;
-    supElement.classList.add(this._printOnlyClass);
-
-    link.appendChild(supElement);
-  }
-
-
-  /**
-   * Get the links that were initially given by the slotted content.
    * @return {NodeList<HTMLAnchorElement>}
+   */
+  _getLinks() {
+    return /** @type {NodeList<HTMLAnchorElement>} */ (
+        this.querySelectorAll(CSS_SELECTORS.LINKS));
+  }
+
+  /**
+   * Get all <sup> elements that have been dynamically appended to the
+   *  LIGHT DOM.
+   * @return {?NodeList<?HTMLElement>}
    * @private
    */
-  get originalLinks() {
-    return this.querySelectorAll('a[href]');
+  _getSupElements() {
+    return /** @type {?NodeList<?HTMLElement>} */ (
+        this.querySelectorAll(`sup.${CSS_SELECTORS.HIDDEN_CLASS}`));
   }
 
 
   /**
-   * Remove all the generated DOM by looping through classes.
-   * @private
+   * All links encapsulated in this component's LIGHT DOM.
+   * @return {NodeList<HTMLAnchorElement>}
    */
-  _removeDOM() {
-    const selector = `.${this._printOnlyClass}`;
-    const lightDOMElements = this.querySelectorAll(selector);
-    const shadowDOMElements = this._shadowRoot.querySelectorAll(selector);
-    let elements = [...lightDOMElements, ...shadowDOMElements];
-
-    // Reverse loop for perf.
-    for (let i = elements.length - 1; i >= 0; i--) {
-      elements[i].remove();
-      elements[i] = null;
-    }
-  }
-
-
-  /** @private */
-  _removeEventListeners() {
-    this._printMediaObserver.removeListener(this.__onPrint);
-  }
-
-
-  /**
-   * Dispose the DOM, event-listeners and observers related to this instance.
-   */
-  disconnectedCallback() {
-    this._removeDOM();
-    this._removeEventListeners();
-
-    this._printMediaObserver = null;
-    this.__onPrint = null;
-    this.elements = null;
+  get links() {
+    return this._links;
   }
 }
+
 
 window.customElements.define('improved-print', ImprovedPrint);

@@ -1,7 +1,7 @@
 {
   "name": "improved-print",
-  "version": "1.0.3",
-  "main": "improved-print.js",
+  "version": "2.0.0",
+  "main": "improved-print.min.js",
   "description": "Turn mid-content hyperlinks into a listed footnote!",
   "repository": {
     "type": "git",

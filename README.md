@@ -36,7 +36,7 @@ npm install improved-print
 <improved-print>
   <article>
     <h1>Hello World!</h1>
-    <p>This is an <a href="https://www.google.com/">example link</a></p>
+    <p>This is an <a href="https://www.google.com/">example link</a>. And <a href="https://pdw.io" data-no-improved-print>this</a> is a link that is ignored on print.</p>
     <a href="https://www.wikipedia.com">Learn more!</a>
   </article>
 </improved-print>
@@ -49,7 +49,6 @@ npm install improved-print
 
 - Think of a better name(?)
 - CSS variables for additional styling
-- Option to ignore specific links
 
 
 ## Credits
