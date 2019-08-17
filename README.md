@@ -3,9 +3,7 @@
 </p>
 
 <p align="center">
-    <h1>improved-print</h1>
-    <a href="https://www.webcomponents.org/element/pimdewit/improved-print"><img src="https://img.shields.io/badge/webcomponents.org-published-blue.svg" alt="Published on webcomponents.org"></a>
-    <img src="https://img.shields.io/bundlephobia/minzip/improved-print?label=filesize" alt="Total filesize is 971bytes">
+    <h1>improved-print <a href="https://www.webcomponents.org/element/pimdewit/improved-print"><img src="https://img.shields.io/badge/webcomponents.org-published-blue.svg" alt="Published on webcomponents.org"></a> <img src="https://img.shields.io/bundlephobia/minzip/improved-print?label=filesize" alt="Total filesize is 971bytes"></h1>
 </p>
 
 improved-print is a native custom-element.
