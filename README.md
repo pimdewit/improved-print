@@ -1,12 +1,15 @@
-[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/pimdewit/improved-print)
+<p align="center">
+    <img src="https://github.com/pimdewit/improved-print/raw/master/.git-header.svg?sanitize=true" alt="Improved print">
+</p>
 
-# Improved Print
+<p align="center">
+    <h1>improved-print</h1>
+    <a href="https://www.webcomponents.org/element/pimdewit/improved-print"><img src="https://img.shields.io/badge/webcomponents.org-published-blue.svg" alt="Published on webcomponents.org"></a>
+    <img src="https://img.shields.io/bundlephobia/minzip/improved-print?label=filesize" alt="Total filesize is 971bytes">
+</p>
 
-<improved-print> is a 'leaf' custom-element. It's sole purpose is to encapsulate HTML, strip out the links within the content, and make a nice list of footnotes when attempting to print.
-
-This web component is based on an A List Apart article from 2005(!), written by [@AaronGustafson](https://twitter.com/AaronGustafson).
-
-Visit the original article: [https://alistapart.com/article/improvingprint](https://alistapart.com/article/improvingprint)
+improved-print is a native custom-element.
+It's purpose is to strip out links within content, and make a nice list of footnotes when attempting to print.
 
 or [view the DEMO](https://pimdewit.github.io/improved-print/index.html)
 
@@ -53,8 +56,8 @@ npm install improved-print
 
 ## Credits
 
-- Original concept and research: Aaron Gustafson @aarongustafson
-- *: Pim de Wit @pdw_io
+- [Original concept](https://alistapart.com/article/improvingprint): Aaron Gustafson [@aarongustafson](https://twitter.com/AaronGustafson)
+- *: Pim de Wit [@pdw_io](https://twitter.com/pdw_io)
 
 ## Licence
 
